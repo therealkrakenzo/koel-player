@@ -1,0 +1,31 @@
+name: Build Android APK
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.3'   # Version sûre pour Koel Player
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build debug APK with fixed Kotlin version
+        run: |
+          ./gradlew assembleDebug -Pkotlin_version=1.8.0
+        working-directory: android
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: koel-player-debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
